@@ -2,17 +2,35 @@ import React, { useState } from 'react';
 import './sign-up.styles.scss';
 import FormInput from '../formInput/FormInput';
 import CustomButton from '../CustomButton/CustomButton';
+import { auth, createUserProfileDocument } from '../../firebase/firebase.utils';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
 
-    console.log(email, password);
-    setPassword('');
-    setEmail('');
+    if (password !== confirmPassword) {
+      alert("passwords don't match");
+      return;
+    }
+
+    try {
+      const { user } = await auth.createUserWithEmailAndPassword(
+        email,
+        password
+      );
+
+      await createUserProfileDocument(user, { displayName });
+
+      setPassword('');
+      setEmail('');
+      setDisplayName('');
+      setConfirmPassword('');
+    } catch (error) {}
   };
 
   return (
@@ -21,6 +39,14 @@ const SignUp = () => {
       <span>Sign up with your email and password</span>
 
       <form onSubmit={submitHandler}>
+        <FormInput
+          type='text'
+          name='displayName'
+          value={displayName}
+          handleChange={(event) => setDisplayName(event.target.value)}
+          label='Display Name'
+          required
+        />
         <FormInput
           type='email'
           name='email'
@@ -34,7 +60,16 @@ const SignUp = () => {
           name='password'
           value={password}
           handleChange={(event) => setPassword(event.target.value)}
-          label='password'
+          label='Password'
+          required
+        />
+
+        <FormInput
+          type='password'
+          name='confirmPassword'
+          value={confirmPassword}
+          handleChange={(event) => setConfirmPassword(event.target.value)}
+          label='Confirm Password'
           required
         />
 
