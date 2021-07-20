@@ -3,18 +3,22 @@ import './sign-in.styles.scss';
 import FormInput from '../formInput/FormInput';
 import CustomButton from '../CustomButton/CustomButton';
 
-import { signInWithGoogle } from '../../firebase/firebase.utils';
+import { auth, signInWithGoogle } from '../../firebase/firebase.utils';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
 
-    console.log(email, password);
-    setPassword('');
-    setEmail('');
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      setPassword('');
+      setEmail('');
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (
