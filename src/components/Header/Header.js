@@ -5,9 +5,14 @@ import { Link } from 'react-router-dom';
 import './header.styles.scss';
 import { ReactComponent as Logo } from '../../assets/crown.svg';
 import { auth } from '../../firebase/firebase.utils';
+import CartIcon from '../cart-icon/CartIcon';
+import CartDropdown from '../cart-dropdown/CartDropdown';
 
 const Header = () => {
-  const user = useSelector((state) => state.user.currentUser);
+  const {
+    user: { currentUser },
+    cart: { hidden },
+  } = useSelector((state) => state);
 
   return (
     <div className='header'>
@@ -21,7 +26,7 @@ const Header = () => {
         <Link className='option' to='/contact'>
           CONTACT
         </Link>
-        {user ? (
+        {currentUser ? (
           <div className='option' onClick={() => auth.signOut()}>
             SIGN OUT
           </div>
@@ -30,7 +35,9 @@ const Header = () => {
             SIGN IN
           </Link>
         )}
+        <CartIcon />
       </div>
+      {hidden ? null : <CartDropdown />}
     </div>
   );
 };
