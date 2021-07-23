@@ -10,14 +10,14 @@ import { useSelector } from 'react-redux';
 import { auth, createUserProfileDocument } from './firebase/firebase.utils';
 import { useDispatch } from 'react-redux';
 import { setCurrentUser } from './redux/user/userActions';
-import userReducer from './redux/user/userReducer';
+// import userReducer from './redux/user/userReducer';
 
 const AppHooks = () => {
-  const dispatch = useDispatch(userReducer);
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user.currentUser);
 
   useEffect(() => {
-    const unsubscribeFromAuth = auth.onAuthStateChanged(async (authUser) => {
+    auth.onAuthStateChanged(async (authUser) => {
       if (authUser) {
         const userRef = await createUserProfileDocument(authUser);
         userRef.onSnapshot((snapShot) => {
@@ -28,13 +28,10 @@ const AppHooks = () => {
             })
           );
         });
+      } else {
+        dispatch(setCurrentUser(authUser));
       }
-      dispatch(setCurrentUser(authUser));
     });
-    return () => {
-      console.log('cleanup');
-      unsubscribeFromAuth();
-    };
   }, [dispatch]);
 
   return (
